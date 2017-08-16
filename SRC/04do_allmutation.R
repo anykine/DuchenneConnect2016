@@ -1,9 +1,9 @@
 #----basic dataset wtih Deletion, Duplication, or Nonsense----
 # repeat 04do.R using more DMD mutation categories
 
-# this is equivalent to all.0 on 04do.R but incluees Dups and Nonsense
-all.anymutation = all %>% filter(
-  Gender == "Male",
+# this is equivalent to all.0 on 04do.R but includes Dups and Nonsense
+all.anymutation = all %>% dplyr::filter(
+  Gender.m == "Male",
   Health.Reason.for.Registration.g == "Duchenne",
   Diagnosis == "Duchenne",
   Country %in% c("AUSTRALIA", "AUSTRIA", "BELGIUM", "CANADA", "CHILE", "CZECH REPUBLIC", "DENMARK", "ESTONIA",
@@ -90,7 +90,7 @@ all.anymutation.ster.44.detail = all.anymutation.ster %>% mutate(
   reg4545 = ifelse(Start.Exon.Intron==45 & End.Exon.Intron==45 & skip_to_render_inframe==44 & Category=="Deletion", 1, 0),
   reg4554 = ifelse(Start.Exon.Intron==45 & End.Exon.Intron==54 & skip_to_render_inframe==44 & Category=="Deletion", 1, 0)
 )
-makeSurvPlot("reg4545", all.anymutation.ster.44.detail, "44 skippable E45del")   
+makeSurvPlot("reg4545", all.anymutation.ster.44.detail, "44 skippable E45del")   # significant
 makeSurvPlot("reg4554", all.anymutation.ster.44.detail, "44 skippable E45del")   
 
 # E51 skippable: Compare subgroups of E51 skippables) + Steroids to everyone else

@@ -26,7 +26,8 @@ library(data.table)
 library(dtplyr)
 library(RColorBrewer)
 
-setwd("C://Users//Richard//Box Sync/projects/DuchenneConnect/")
+setwd("/home/rwang/projects/DuchenneConnect")  # lab desktop
+#setwd("C://Users//Richard//Box Sync/projects/DuchenneConnect/")
 #setwd("/home/rwang/box.com/projects/DuchenneConnect/")
 list.files("DATA/2016October/")
 data_dir = "DATA/2016October/"

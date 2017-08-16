@@ -40,15 +40,18 @@ setkey(cardio, Patient.ID)
 cardio2 = cardio[ , .SD[c(.N)], by=Patient.ID]
 
 #
-# ----------- combine all ------------
+# ----------- combine muscle2, ster2, gen2 into 'all' ------------
 #
-#check no dups
+#check no dups in each table, should be 0rows
 lapply(list(muscle2,ster2, gen2), checkUniquePatientsPerRow, myKey="Patient.ID")
 
 # Age.m = muscle, Age.s = steroid, Age = Genetic Excel table
 all = merge(merge(muscle2, ster2, by.x="Patient.ID", by.y="Patient.ID", suffixes=c(".m",".s")),
             gen2, by.x="Patient.ID", by.y="Patient.ID", suffixes=c(".ms", ".g"))
 
+#
+# ----------- combine 'all' with cardio2 ------------
+#
 all = merge(all, cardio2, by.x="Patient.ID", by.y="Patient.ID", suffixes=c("", ".c"))
 
 #save.image("DCdata.RData")
