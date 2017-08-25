@@ -26,9 +26,12 @@ library(data.table)
 library(dtplyr)
 library(RColorBrewer)
 
-setwd("/home/rwang/projects/DuchenneConnect")  # lab desktop
+setwd("/home/rwang/projects/DuchenneConnect2016")  # lab desktop
 #setwd("C://Users//Richard//Box Sync/projects/DuchenneConnect/")
 #setwd("/home/rwang/box.com/projects/DuchenneConnect/")
+
+#load("SRC/DCdata.RData")
+
 list.files("DATA/2016October/")
 data_dir = "DATA/2016October/"
 
@@ -75,3 +78,6 @@ setnames(ster, make.names(colnames(ster)))   # fix the spaces in names
 #
 cardio = fread(paste(data_dir, "Cardiac Module Oct 2016.csv", sep="/"))
 setnames(cardio, make.names(colnames(cardio)))   # fix the spaces in names
+
+
+# save.image("SRC/DCdata.RData")
