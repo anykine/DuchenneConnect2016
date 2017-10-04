@@ -51,8 +51,8 @@ all = merge(merge(muscle2, ster2, by.x="Patient.ID", by.y="Patient.ID", suffixes
 
 #
 # ----------- combine 'all' with cardio2 ------------
-#
-all = merge(all, cardio2, by.x="Patient.ID", by.y="Patient.ID", suffixes=c("", ".c"))
+# Don't use yet
+#all = merge(all, cardio2, by.x="Patient.ID", by.y="Patient.ID", suffixes=c("", ".c"))
 
-#save.image("DCdata.RData")
+# save.image("SRC/DCdata2016.RData")
 

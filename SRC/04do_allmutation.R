@@ -83,7 +83,8 @@ makeSurvPlot("s55naDel", all.anymutation.ster, "55 skippable NA")
 makeSurvPlot("Dup", all.anymutation.ster, "Dupications")
 makeSurvPlot("Nonsense", all.anymutation.ster, "Nonsense")
 
-
+#rought counts ... numbers are small
+all.anymutation.ster %>% filter(Category=="Deletion") %>% select(skip_to_render_inframe) %>% table()
 
 # E44 skippable: Compare E45del  or E45-54del Deletions) + Steroids to everyone else
 # E45dels are milder! Significant! P=0.029

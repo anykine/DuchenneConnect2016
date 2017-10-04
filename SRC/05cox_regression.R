@@ -18,8 +18,8 @@ all.anymutation.coxNew = all.anymutation %>% filter(
                       mutationType = ifelse(Category=="Nonsense", "Nonsense", mutationType)) 
 
 # check
-all.anymutation.coxNew %>% select(mutationType) %>% as.data.frame %>% table()
-all.anymutation.coxNew %>% filter(mutationType=="s44") %>% select(mutationType, Category) %>% table()
+all.anymutation.coxNew %>% dplyr::select(mutationType) %>% as.data.frame %>% table()
+all.anymutation.coxNew %>% filter(mutationType=="s44") %>% dplyr::select(mutationType, Category) %>% table()
 
 # steroid status, mutation must be factors
 all.anymutation.coxNew = all.anymutation.coxNew %>% mutate(steroidStatus = factor(all.anymutation.coxNew$Q1.s))
@@ -37,6 +37,9 @@ survfit(coxfitNew)
 #diagnostic
 cox.zph(coxfitNew) # pval small means cox assumptions violated...due to deflazacort?
 plot(cox.zph(coxfitNew))  #diagnostic, is line flat? 
+
+# write table
+write.csv(tidy(coxfitNew), "RESULTS/2016/201604/cox_general.csv", quote=F)
 
 # plot residuals. Not working, try viewing videos
 #https://github.com/ryandata/Survival
@@ -61,7 +64,7 @@ all.anymutation.coxNew2 = all.anymutation.coxNew %>%
 )
 # lost our labels for some reason
 #check
-all.anymutation.coxNew2 %>% select(mutationType2) %>% table()
+all.anymutation.coxNew2 %>% dplyr::select(mutationType2) %>% table()
 all.anymutation.coxNew2$mutationType2 %>% class
 # must be factor
 all.anymutation.coxNew2 = all.anymutation.coxNew2 %>% mutate(mutationType2 = factor(mutationType2))
@@ -72,6 +75,8 @@ coxfitNew2 = coxph(Surv(all.anymutation.coxNew2$time_to_wheelchair, all.anymutat
                     as.factor(all.anymutation.coxNew2$steroidStatus)+ as.factor(all.anymutation.coxNew2$mutationType2))
 summary(coxfitNew2)
 survfit(coxfitNew2)
+# write table
+write.csv(tidy(coxfitNew2), "RESULTS/2016/201604/cox_E45.csv", quote=F)
 
 #----cox regression, split E51 skippable into E49_50del and everyone else -----
 
@@ -79,15 +84,15 @@ survfit(coxfitNew2)
 all.anymutation.coxNew3 = all.anymutation.coxNew2 %>% 
   mutate(mutationType3 = ifelse(
     Category=="Deletion" & skip_to_render_inframe==51 & startstop=="49,50", 
-    "s51E4951del",
+    "s51E4950del",
     ifelse(
       Category=="Deletion" & skip_to_render_inframe==51 & startstop!="49,50",
-      "s51notE4951del",
+      "s51notE4950del",
       as.character(mutationType2)
     )
   )
 )
-all.anymutation.coxNew3 %>% select(mutationType3) %>% table()
+all.anymutation.coxNew3 %>% dplyr::select(mutationType3) %>% table()
 all.anymutation.coxNew3$mutationType3 %>% class
 
 # must be factor
@@ -99,12 +104,14 @@ coxfitNew3 = coxph(Surv(all.anymutation.coxNew3$time_to_wheelchair, all.anymutat
                      as.factor(all.anymutation.coxNew3$steroidStatus)+ as.factor(all.anymutation.coxNew3$mutationType3))
 summary(coxfitNew3)
 survfit(coxfitNew3)
+# write table
+write.csv(tidy(coxfitNew3), "RESULTS/2016/201604/cox_E49_50.csv", quote=F)
 
 #----cox regression, split E8 skippable into E3_7del and everyone else -----
 # this one start with all.anymutation.coxNew2 (e44 split because e51 is not informative)
 # this one CONFIRMS that steroids, E45del, and E3_7del are significant covariates 
 # FINAL
-all.anymutation.coxNew2 %>% filter(Category=="Deletion", skip_to_render_inframe==8) %>% select(startstop) %>% table()
+all.anymutation.coxNew2 %>% filter(Category=="Deletion", skip_to_render_inframe==8) %>% dplyr::select(startstop) %>% table()
 
 all.anymutation.coxNew4 = all.anymutation.coxNew2 %>% 
   mutate(mutationType4 = ifelse(
@@ -117,7 +124,7 @@ all.anymutation.coxNew4 = all.anymutation.coxNew2 %>%
     )
   )
   )
-all.anymutation.coxNew4 %>% select(mutationType4) %>% table()
+all.anymutation.coxNew4 %>% dplyr::select(mutationType4) %>% table()
 all.anymutation.coxNew4$mutationType4 %>% class
 # must be factor
 all.anymutation.coxNew4 = all.anymutation.coxNew4 %>% mutate(mutationType4 = factor(mutationType4))
@@ -129,6 +136,8 @@ coxfitNew4 = coxph(Surv(all.anymutation.coxNew4$time_to_wheelchair, all.anymutat
 summary(coxfitNew4)
 survfit(coxfitNew4)
 
+# write table
+write.csv(tidy(coxfitNew4), "RESULTS/2016/201604/cox_E3_7.csv", quote=F)
 
 #----cox regression on steroid only patients, what mutations are signif?----
 all.anymutation.coxNewSter = all.anymutation.coxNew %>% filter(
