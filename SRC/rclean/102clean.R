@@ -1,0 +1,72 @@
+#######################################
+# Project: DuchenneConnect2016
+# Purpose: Clean DuchenneConnect Data from October 2016 & October 2017
+# Module: DuchenneConnect2016/SRC/rclean/102clean.R
+# Author: Richard T Wang
+#
+
+
+# Some data sets have multiple rows per individual (time course)
+# so I use data.tables() to get last row to dedup
+
+
+#
+# ----------- skip -------------
+# remove the extra field from skips
+skips$X <- NULL
+
+#
+#
+# ----------- MUSCLE DATA -------------
+#
+# Data cleanup
+setkey(muscle, Patient.ID)
+muscle2 = muscle[, .SD[c(.N)], by=Patient.ID]  # this gets the last row for each patient record 
+
+
+#
+#
+# ----------- GENETIC DATA -------------
+#
+# get the last observation for each group
+setkey(gen, Patient.ID)
+gen2= gen[, .SD[c(.N)], by=Patient.ID]  # this gets the last row for each patient record 
+
+# REQUIRED fix columns with same name, for merge later
+# REQUIRED There are 3 columns with name "Other Value"
+tmp.names = make.names(colnames(gen))
+#tmp.names[c(22,24,26)] = c("Laboratory.Other.Value", "Test.Method.Other.Value", "Category.Other.Value")
+tmp.names[c(22,24,26)] = c("GenLaboratory.Other.Value", "GenTest.Method.Other.Value", "GenCategory.Other.Value")
+setnames(gen, tmp.names)
+setnames(gen2, tmp.names)
+
+#
+#
+# ----------- STEROID DATA -------------
+#
+setkey(ster, Patient.ID)
+ster2 = ster[ , .SD[c(.N)], by=Patient.ID]
+
+#
+#
+# ----------- CARDIO DATA -------------
+#
+setkey(cardio, Patient.ID)
+cardio2 = cardio[ , .SD[c(.N)], by=Patient.ID]
+
+#
+# ----------- combine muscle2, ster2, gen2 into 'all' ------------
+#
+#check no dups in each table, should be 0rows
+lapply(list(muscle2,ster2, gen2), checkUniquePatientsPerRow, myKey="Patient.ID")
+
+# using Reduce to merge datasetset (cleaner than above) 
+# this uses data.table merge(), implicit KEY for merge is Patient.ID
+# Each table's columns are prefixed 
+#  1. Mus = muscle
+#  2. Ste = steroid
+#  3. Gen = genetic
+#  4. Car = cardio
+all =  Reduce(function(...) merge(..., all=FALSE), list(muscle2, ster2, gen2, cardio2))
+
+# save.image("SRC/DCdata2016.RData")
