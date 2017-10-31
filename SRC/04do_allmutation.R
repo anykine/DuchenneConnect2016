@@ -95,6 +95,17 @@ all.anymutation.ster.44.detail = all.anymutation.ster %>% mutate(
 makeSurvPlot("reg4545", all.anymutation.ster.44.detail, "44 skippable E45del")   # significant
 makeSurvPlot("reg4554", all.anymutation.ster.44.detail, "44 skippable E45del")   
 
+# E44 skippable: split into E45del, not E45del, and all other groups
+# for 3-way survival plot 
+# Use for paper.
+all.anymutation.ster %>% filter(skip_to_render_inframe==44 & Category=="Deletion") %>%  
+  xtabs(~startstop, data = .)
+all.anymutation.ster.44.subgroups = all.anymutation.ster %>% mutate(
+  s44_subgroups = ifelse(s44naDel==1 & Start.Exon.Intron==45 & End.Exon.Intron==45, "44skippable E45del",
+                         ifelse(s44naDel==1 & Start.Exon.Intron!=45 & End.Exon.Intron!=45, "not44skippable E45del", "all others"))
+) #%>% makeSurvPlot("s44_subgroups", data = . , "44 skippable by E45 subgroups")   
+
+
 # E51 skippable: Compare subgroups of E51 skippables) + Steroids to everyone else
 # E49_50dels are more severe! Significant P=0.00791
 all.anymutation.ster.51.detail = all.anymutation.ster %>% mutate(
@@ -110,6 +121,20 @@ makeSurvPlot("reg4850", all.anymutation.ster.51.detail, "51 skippable E48_50del"
 makeSurvPlot("reg4950", all.anymutation.ster.51.detail, "51 skippable E49_50del") # Significant
 makeSurvPlot("reg5050", all.anymutation.ster.51.detail, "51 skippable E50del") 
 makeSurvPlot("reg5252", all.anymutation.ster.51.detail, "51 skippable E52del") 
+
+# E51 skippable by subgroups
+all.anymutation.ster %>% filter(skip_to_render_inframe==51 & Category=="Deletion") %>%  
+  xtabs(~startstop, data = .)
+all.anymutation.ster.51.subgroups = all.anymutation.ster %>% mutate(
+  s51_subgroups = ifelse(s51naDel==1 & Start.Exon.Intron == 45, "45-50del",
+                         ifelse(s51naDel==1 & Start.Exon.Intron == 48 , "48-50del",
+                                ifelse(s51naDel==1 & Start.Exon.Intron == 49 , "49-50del",
+                                       ifelse(s51naDel==1 & Start.Exon.Intron == 50 , "50-50del",
+                                              ifelse(s51naDel==1 & Start.Exon.Intron == 52, "52-52del", "all others"
+                                              )))))
+  )
+  
+  
 
 #---- NO Steroid Use ----
 # repeat above but using no steroid group
@@ -192,4 +217,11 @@ png(file="RESULTS/2016/201604/fig2_survDetail.png")
 layout(matrix(1:2,2,1))
 makeSurvPlot("reg4545", all.anymutation.ster.44.detail, "44 skippable E45del")   
 makeSurvPlot("reg4950", all.anymutation.ster.51.detail, "51 skippable E49_50del") # Significant
+dev.off()
+
+# Fig 2 with all subgroups
+png(file="RESULTS/2016/201604/fig2_survDetailsubgroup.png")
+layout(matrix(1:2,2,1))
+makeSurvPlot("s44_subgroups", all.anymutation.ster.44.subgroups , "44 skippable by E45 subgroups")  
+makeSurvPlot("s51_subgroups", all.anymutation.ster.51.subgroups , "51 skippable by subgroups")
 dev.off()

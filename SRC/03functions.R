@@ -50,3 +50,25 @@ makeSurvPlot = function(strat, data, title) {
          lty=1:10, col=1:10)
   print(fit.diff)
 }
+
+makeSurvPlotNoStrat = function(data, title) { #not working
+  require(survival)
+  formula = eval(
+    parse(text = "Surv(time_to_wheelchair, walking_01==0)~1")
+  )
+  plot(survfit(formula, data = data, conf.type="log-log"), lty=1:10, col=1:10, main=title,
+       xaxt="n", yaxt="n", bty="l", xlab="Age (years)", ylab="Percent Survival", mark.time=T)
+  axis(1, las=1)
+  axis(2, las=2)
+  fit.diff = survdiff(formula, data = data)
+  fit.diff
+  sf = survfit(formula, data = data, conf.type="log-log")
+  print(sf)
+  
+  pval <- signif( 1-pchisq(fit.diff$chisq, length(fit.diff$n)-1), digits=3)
+  text(3, 0.6, paste0("p=",pval))
+  # legend("bottomleft", bty="n",
+  #        legend=apply(as.data.frame(table(eval(data[[strat]]))), 1, paste, collapse=" n="),
+  #        lty=1:10, col=1:10)
+  print(fit.diff)
+}
