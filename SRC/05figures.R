@@ -93,3 +93,90 @@ makeSurvPlot("reg4545", all.anymutation.ster.44.detail, "44 skippable E45del")  
 makeSurvPlot("reg4950", all.anymutation.ster.51.detail, "51 skippable E49_50del") # Significant
 
 dev.off()
+
+
+#----- alt format Figure 1: all plots on same plot ----
+# reshape2 a new variable
+skip.cols = grep("naDel|Dup|Nonsense", names(all.anymutation.ster))
+z = all.anymutation.ster %>% mutate(
+  survPlotCat = case_when(
+    s8naDel == 1 ~ "s8naDel",
+    s44naDel == 1 ~ "s44naDel",
+    s45naDel == 1 ~ "s45naDel",
+    s50naDel == 1 ~ "s50naDel",
+    s51naDel == 1 ~ "s51naDel",
+    s52naDel == 1 ~ "s52naDel",
+    s53naDel == 1 ~ "s53naDel",
+    s55naDel == 1 ~ "s55naDel",
+    Dup == 1 ~ "Dup",
+    Nonsense==1 ~ "Nonsense"
+  )
+)
+
+pdf(file="RESULTS/2016/201604/fig1alt_allPlotsTogether.pdf")
+makeSurvPlot("survPlotCat", z, "all survival plots", conf.int=F) 
+dev.off()
+
+#----- alt format Figure 1: only 8,44,51 separate and all other as average // using RMS to plot----
+z = all.anymutation.ster %>% mutate(
+  survPlotCat = case_when(
+    s8naDel == 1 ~ "s8naDel",
+    s44naDel == 1 ~ "s44naDel",
+    s51naDel == 1 ~ "s51naDel",
+    TRUE  ~ "others"
+  )
+)
+
+pdf(file="RESULTS/2016/201604/fig1alt_3PlotsPlusOthers.pdf")
+makeSurvPlot("survPlotCat", z, "8/44/51/others merge") 
+dev.off()
+
+
+km.by.cat <- survfit(Surv(time_to_wheelchair, walking_01==0) ~ survPlotCat, data = z, conf.type = "log-log")
+plot(km.by.cat, lty=1:10, col=1:10, main='title',
+     xaxt="n", yaxt="n", bty="l", xlab="Age (years)", ylab="Percent Survival", mark.time=T, conf.int=TRUE)
+
+
+# fix rms::survplot() use npsurv()
+# RMS gives ugly conf intervals
+library(rms)
+km.by.catNp = npsurv(formula=Surv(time_to_wheelchair, walking_01==0) ~ survPlotCat, data = z)
+survplot(km.by.catNp, conf.type="log-log", conf="bands", col=1:10, conf.int=0.99)
+survplot(km.by.catNp, conf.type="log-log", conf="bars", col=1:10, conf.int=0.99) 
+survplotp(km.by.catNp, conf.type="log-log", conf="bands") #interactive
+
+#----- alt format Figure 1: only 8,44,51 separate and all other as average // using survminer----
+library(survminer)
+require(survival)
+
+# remove duplicates? argh. some deletions can be solved by skipping 2 different exons...ignoring for now
+dups = all.anymutation$Patient.ID[ duplicated(all.anymutation$Patient.ID)]
+zz = z %>% filter(!Patient.ID %in% dups)
+
+# create the Survfit
+fit <- survfit(Surv(time_to_wheelchair, walking_01==0) ~ survPlotCat, data = z, conf.type = "log-log")
+ggsurvplot(fit, data = z,
+           risk.table=F,
+           pval=TRUE,
+           conf.int=0.99,
+           break.time.by=3,
+           risk.table.y.text.col=T,
+           risk.table.y.text = F,
+           xlim=c(4,20),
+           conf.int.style="ribbon")
+
+ggsave("fig1_condensed.pdf") # edit in illustrator to remove CI bands around 8/44/51
+#ggsave("../RESULTS/2016/201604/fig1_condensed.pdf") #can't write to directory for some reason
+ggsurvplot_add_all(fit, data = z)
+
+#even after removing duplicates, its still significant. too hard to explain.
+fit2 = survfit(Surv(time_to_wheelchair, walking_01==0)~survPlotCat, data = zz, conf.type="log-log")
+ggsurvplot(fit2, data = zz,
+           risk.table=F,
+           pval=TRUE,
+           conf.int=0.99,
+           break.time.by=3,
+           risk.table.y.text.col=T,
+           risk.table.y.text = T,
+           xlim=c(0,20),
+           conf.int.style="ribbon")

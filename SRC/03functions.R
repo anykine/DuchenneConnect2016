@@ -29,13 +29,13 @@ histSurveyTime = function(dt, column="Survey.Time") {
 # plot survival curve
 # makeSurvPlot("strat", all.ster, "Steroid effect")
 # data is a data.table
-makeSurvPlot = function(strat, data, title) {
+makeSurvPlot = function(strat, data, title,...) {
   require(survival)
   formula = eval(
     parse(text = paste0("Surv(time_to_wheelchair, walking_01==0) ~", strat))
   )
   plot(survfit(formula, data = data, conf.type="log-log"), lty=1:10, col=1:10, main=title,
-       xaxt="n", yaxt="n", bty="l", xlab="Age (years)", ylab="Percent Survival", mark.time=T)
+       xaxt="n", yaxt="n", bty="l", xlab="Age (years)", ylab="Percent Survival", mark.time=T,...)
   axis(1, las=1)
   axis(2, las=2)
   fit.diff = survdiff(formula, data = data)
