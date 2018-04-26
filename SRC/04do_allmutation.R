@@ -86,6 +86,13 @@ makeSurvPlot("Nonsense", all.anymutation.ster, "Nonsense")
 #rought counts ... numbers are small
 all.anymutation.ster %>% filter(Category=="Deletion") %>% select(skip_to_render_inframe) %>% table()
 
+# E8 skippable: Compare 3-7del with all others
+# E3-7 are milder! Significant! P=0.0003
+all.anymutation.ster.8.detail = all.anymutation.ster %>% mutate(
+  reg37 = ifelse(Start.Exon.Intron==3 & End.Exon.Intron==7 & skip_to_render_inframe==8 & Category=="Deletion", 1, 0)
+)
+makeSurvPlot("reg37", all.anymutation.ster.8.detail, "8 skippable E3-7del")   # significant
+
 # E44 skippable: Compare E45del  or E45-54del Deletions) + Steroids to everyone else
 # E45dels are milder! Significant! P=0.029
 all.anymutation.ster.44.detail = all.anymutation.ster %>% mutate(

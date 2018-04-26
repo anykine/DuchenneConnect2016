@@ -83,8 +83,10 @@ makeSurvPlot("Nonsense", all.anymutation.ster, "Nonsense")
 dev.off()
 
 
-pdf(file="RESULTS/2016/201604/fig2_survDetail.pdf")
-layout(matrix(1:2,1,2))
+pdf(file="RESULTS/2016/201604/fig2_survDetail2018.pdf")
+layout(matrix(1:4,2,2))
+# E8 skippable, E3-7del more mild
+makeSurvPlot("reg37", all.anymutation.ster.8.detail, "8 skippable E3-7del")   # significant
 # E44 skippable, E45 deletions only, more mild
 # compare E45dels to ALL OTHERS
 makeSurvPlot("reg4545", all.anymutation.ster.44.detail, "44 skippable E45del")   # significant
@@ -159,11 +161,13 @@ ggsurvplot(fit, data = z,
            risk.table=F,
            pval=TRUE,
            conf.int=0.99,
-           break.time.by=3,
+           break.time.by=5,
+           break.y.by=0.2,
            risk.table.y.text.col=T,
            risk.table.y.text = F,
            xlim=c(4,20),
-           conf.int.style="ribbon")
+           conf.int.style="ribbon",
+           ylab="Percent Survival")
 
 ggsave("fig1_condensed.pdf") # edit in illustrator to remove CI bands around 8/44/51
 #ggsave("../RESULTS/2016/201604/fig1_condensed.pdf") #can't write to directory for some reason
@@ -180,3 +184,15 @@ ggsurvplot(fit2, data = zz,
            risk.table.y.text = T,
            xlim=c(0,20),
            conf.int.style="ribbon")
+
+
+
+# Table 1 composition
+all.anymutation.ster %>% dplyr::select(skip_to_render_inframe) %>% xtabs()
+
+all.anymutation.ster %>% dplyr::filter(skip_to_render_inframe==8) %>% select(Start.Exon.Intron, End.Exon.Intron)
+all.anymutation.ster %>% dplyr::filter(skip_to_render_inframe==55) %>% select(Start.Exon.Intron, End.Exon.Intron)
+all.anymutation.ster %>% dplyr::filter(is.na(skip_to_render_inframe)) %>% select(Start.Exon.Intron, End.Exon.Intron, skip_to_render_inframe)
+# Others = other exonic deletiosn not currently skippable
+all.anymutation.ster %>% dplyr::filter(is.na(skip_to_render_inframe)) %>% select(Start.Exon.Intron, End.Exon.Intron) %>%
+  mutate(startstop = paste(Start.Exon.Intron, End.Exon.Intron, sep=",")) %>% xtabs(~startstop, data = .)
